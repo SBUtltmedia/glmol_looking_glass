@@ -1,4 +1,4 @@
-require('../template/entry');
+require('./template/entry');
 
 var controller = new Leap.Controller()
 controller.on("frame", function(frame) {
