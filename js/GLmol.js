@@ -1948,7 +1948,7 @@ var GLmol = (function() {
             height:   80,
             depth:   1,
             color:   '#AAA',
-            molId:   'pdb:2POR',
+            molId:   'pdb:1yyf',
             color:  'chainbow', //Color by: chainbow, chain, ss, b, polarity
             mainchain:   'thickRibbon', //Main chain as: thickRibbon, ribbon, strand, cylinderHelix, chain, tube, bonds, none
             base:   'nuclLine', //Nucleic acid bases as: nuclStick, nuclLine, nuclPolygon

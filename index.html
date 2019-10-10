@@ -8,13 +8,10 @@
     body {
       margin: 0;
     }
-
     canvas {
       width: 100%;
       height: 100%;
     }
-
-    ;
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/109/three.min.js" charset="utf-8"></script>
   <script src="js/holoplay.min.js" charset="utf-8"></script>
@@ -23,31 +20,24 @@
   <script src="js/roll-pitch-yaw.js"></script>
 
   <script>
-    var scene, camera, renderer, holoplay, pivot;
-    var magic=true;
-    //Lighting elements
+    // Canvas elements
+    var scene, camera, renderer, holoplay;
+
+    // Lighting elements
     var directionalLight;
     var ambientLight;
-    var globalMol;
-    //Scene objects
-    var cubeGeometry;
-    var cubeMaterial;
-    var cubes;
-    var SPEED = .01;
-    window.addEventListener('resize', function() {
-      var width = window.innerWidth;
-      var height = window.innerHeight;
 
-      renderer.setSize(width, height);
+    // Scene objects
+    var globalMol, pivot;
 
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    });
+    // Global state variable
+    var state = {};
+    state.lookingGlass = true;
 
-    //Initialize our variables
+    // Initialize our variables
     function init() {
       scene = new THREE.Scene();
-      pivot = new THREE.Group();
+      scene.background = new THREE.Color( 0xAAAAAA );
 
       camera = new THREE.PerspectiveCamera(13.5, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.set(0, -0.7, 20);
@@ -56,9 +46,11 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
       renderer.render(scene, camera);
-    if(magic){
-       holoplay = new HoloPlay(scene, camera, renderer);
-}
+
+      if (state.lookingGlass) {
+        holoplay = new HoloPlay(scene, camera, renderer);
+      }
+
       directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
       directionalLight.position.set(0, 1, 2);
       scene.add(directionalLight);
@@ -69,86 +61,71 @@
       var glmol = new GLmol('glmol01', true);
       glmol.returnModelGroup().then(function(mol) {
         globalMol = mol;
-        globalMol.scale.set(0.05, 0.05, 0.05)
-        console.log(globalMol);
+        globalMol.scale.set(0.05, 0.05, 0.05);
 
+        var boundingBox = new THREE.Box3();
+        boundingBox.setFromObject(globalMol);
+
+        var center = boundingBox.center();
+        console.log(center);
+        globalMol.position.set(-center.x, -center.y, -center.z);
+
+        pivot = new THREE.Object3D();
+        pivot.add(globalMol);
         scene.add(pivot);
-        pivot.add(globalMol)
       })
     }
 
-
-    //Render the scene
+    // Render the scene
     function draw() {
+      var speed = 0.01;
+
       // if (pivot) {
-        pivot.rotation.y -= SPEED;
-        if (!paused) {
-          pivot.rotation.y = hand.yaw();
-          pivot.rotation.x = hand.pitch();
-          pivot.rotation.z = hand.roll();
-          // globalMol.position.set(normalize(hand.palmPosition[0], -5, 5), normalize(hand.palmPosition[1], -5, 5), normalize(hand.palmPosition[2], -20, 0));
-          // console.log(globalMol.position);
+      if (paused) {
+        pivot.rotation.y -= speed;
+      } else {
+        pivot.rotation.y = hand.yaw();
+        pivot.rotation.x = hand.pitch();
+        pivot.rotation.z = hand.roll();
+
+        console.log(pivot.rotation);
+        // globalMol.position.set(normalize(hand.palmPosition[0], -5, 5), normalize(hand.palmPosition[1], -5, 5), normalize(hand.palmPosition[2], -20, 0));
+        // console.log(globalMol.position);
         // }
       }
-      if(magic){
-              holoplay.render();
-      }
-      else{renderer.render(scene, camera);}
 
+      if (state.lookingGlass) {
+        holoplay.render();
+      } else {
+        renderer.render(scene, camera);
+      }
     }
 
     function normalize(val, max, min) {
       return (val - min) / (max - min);
     }
 
-    //Game loop
+    // Animation loop
     function RunApp() {
-
       requestAnimationFrame(RunApp);
       draw();
     }
+
+    window.addEventListener('resize', function() {
+      var width = window.innerWidth;
+      var height = window.innerHeight;
+
+      renderer.setSize(width, height);
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    });
+
     window.addEventListener('load', (event) => {
       init();
       RunApp();
-
     });
-    //     window.onload = function() {
-    //
-    //   var renderer = new THREE.WebGLRenderer();
-    //   renderer.setSize( 800, 600 );
-    //   document.body.appendChild( renderer.domElement );
-    //
-    //   var scene = new THREE.Scene();
-    //
-    //   var camera = new THREE.PerspectiveCamera(
-    //     35,			// Field of view
-    //     800 / 600,		// Aspect ratio
-    //     0.1,			// Near plane
-    //     10000			// Far plane
-    //   );
-    //   // camera.position.set( -15, 10, 10 );
-    //   camera.position.set(0,0,20);
-    //   camera.lookAt(scene.position);
-    //
-    //   var geometry = new THREE.BoxGeometry( 5, 5, 5 );
-    //   var material = new THREE.MeshLambertMaterial( { color: 0xFF0000 } );
-    //   var mesh = new THREE.Mesh( geometry, material );
-    //   //scene.add( mesh );
-    //
-    //   var light = new THREE.PointLight( 0xFFFF00 );
-    //   light.position.set( 10, 0, 10 );
-    //   scene.add(light);
-    //   var glmol= new GLmol('glmol01', true);
-    //
-    //     glmol.returnModelGroup().then(function(mol) {
-    //       scene.add(mol);
-    //       console.log(mol)
-    //     })
-    //
-    //   renderer.setClearColor( 0xdddddd, 1);
-    //   renderer.render( scene, camera );
-    //
-    // };
+
   </script>
 </head>
 

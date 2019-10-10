@@ -1,17 +1,25 @@
+
+// Global variables
 var hand;
 var paused = true;
+
+
+// Pause settings controlled by space key
 window.onkeypress = function(e) {
   if (e.charCode == 32) {
-    if (paused == false) {
-      paused = true;
-    } else {
-      paused = false;
-    }
+    paused = !paused
+    // if (paused == false) {
+    //   paused = true;
+    // } else {
+    //   paused = false;
+    // }
   }
 };
+
 var controller = new Leap.Controller({
   enableGestures: true
 });
+
 controller.loop(function(frame) {
   latestFrame = frame;
   if (paused) {
@@ -31,6 +39,7 @@ controller.loop(function(frame) {
   // console.log(str);
   // document.getElementById('out').innerHTML = str;
 });
+
 controller.on('ready', function() {
   console.log("ready");
 });
