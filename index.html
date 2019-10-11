@@ -28,11 +28,11 @@
     var ambientLight;
 
     // Scene objects
-    var globalMol, pivot;
+    var globalMol, pivot, boundingBox;
 
     // Global state variable
     var state = {};
-    state.lookingGlass = true;
+    state.lookingGlass = false;
 
     // Initialize our variables
     function init() {
@@ -63,11 +63,33 @@
         globalMol = mol;
         globalMol.scale.set(0.05, 0.05, 0.05);
 
-        var boundingBox = new THREE.Box3();
-        boundingBox.setFromObject(globalMol);
+        boundingBox = new THREE.Box3();
+        boundingBox.expandByObject(globalMol);
+        // boundingBox.setFromObject(globalMol);
+
+        window.addEventListener("keypress", function(evt) {
+          // console.log(boundingBox.center())
+          // console.log(boundingBox.getSize())
+          // var center = new THREE.Vector3(0, 0, 0)
+          // var oldSize = boundingBox.getSize();
+
+          var keymap = ["-","+"];
+          // glmol.scale(keymap.indexOf(evt.key)*2-1);
+
+          var scalar = (keymap.indexOf(evt.key)*2-1) / 10;
+          // console.log(scalar)
+          pivot.scale.set(pivot.scale.x+scalar, pivot.scale.y+scalar, pivot.scale.z+scalar);
+          // console.log(pivot.scale)
+
+          // boundingBox.setFromCenterAndSize(center, oldSize.addScalar(keymap.indexOf(evt.key)*2-1));
+          // boundingBox.expandByObject(globalMol);
+          // boundingBox.setFromObject(globalMol);
+          // console.log(boundingBox.center())
+          // console.log(boundingBox.getSize())
+        });
 
         var center = boundingBox.center();
-        console.log(center);
+        // console.log(center);
         globalMol.position.set(-center.x, -center.y, -center.z);
 
         pivot = new THREE.Object3D();

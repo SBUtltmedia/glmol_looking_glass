@@ -94,7 +94,7 @@ var GLmol = (function() {
           // this.orthoscopicCamera.lookAt(new TV3(0, 0, this.CAMERA_Z));
 
           var self = this;
-
+          this.scaleDelta=.01;
           // which contains modelGroup
           this.modelGroup = new THREE.Object3D();
           this.bgColor = 0x000000;
@@ -596,6 +596,14 @@ var GLmol = (function() {
           console.log('THIS IS ATTOMR: ' + atomR);
           this.drawAtomsAsSphere(group, forSpheres, atomR, !scale, scale);
         };
+
+        GLmol.prototype.scale = function(direction) {
+          var newScale=  this.modelGroup.scale.x+(direction*this.scaleDelta);
+
+          this.modelGroup.scale.set(newScale,newScale,newScale)
+
+        }
+
 
         GLmol.prototype.defineCell = function() {
           var p = this.protein;
