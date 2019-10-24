@@ -39,14 +39,13 @@ THREE.Matrix4.prototype.isIdentity = function() {
 
 var GLmol = (function() {
 
-  function GLmol(id, suppressAutoload) {
+        function GLmol(id, suppressAutoload) {
+           return true;
+        }
 
-     return true;
-  }
-
-        GLmol.prototype.create = function(resolve, reject) {
+        GLmol.prototype.create = function(resolve, reject, id) {
           // this.schema = this.data;
-             console.log(this)
+          console.log(this)
           this.Nucleotides = ['  G', '  A', '  T', '  C', '  U', ' DG', ' DA', ' DT', ' DC', ' DU'];
           this.ElementColors = {
             "H": 0xCCCCCC,
@@ -81,7 +80,6 @@ var GLmol = (function() {
             "CU": 1.4,
             "NI": 1.63
           };
-
 
           this.aaScale = 1;
           // or 2
@@ -130,25 +128,23 @@ var GLmol = (function() {
           this.currentModelPos = 0;
           this.cz = 0;
 
-          this.download(resolve,reject)
-
+          // insert query in this format = pdb:molID
+          this.download(resolve, reject, id);
         }
 
-        GLmol.prototype.returnModelGroup = function() {
+        GLmol.prototype.returnModelGroup = function(id) {
           return new Promise((resolve, reject)=> {
+            this.create(resolve, reject, id)
+          });
+        }
 
-           this.create(resolve, reject)
-         });
-          }
-
-
-
-        GLmol.prototype.download = function(resolve, reject) {
+        GLmol.prototype.download = function(resolve, reject, query) {
           var baseURL = '';
           var _this = this;
-          var _resolve= resolve;
+          var _resolve = resolve;
 
-          var query = 'pdb:2POR';
+          // var query = 'pdb:2POR';
+          console.log(query)
           if (query.substr(0, 4) == 'pdb:') {
             query = query.substr(4).toUpperCase();
             if (!query.match(/^[1-9][A-Za-z0-9]{3}$/)) {
@@ -164,7 +160,6 @@ var GLmol = (function() {
             }
             uri = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/" + query + "/SDF?record_type=3d";
           }
-
 
           fetch(uri).then(function(ret) {
             ret.text().then(function(text) {
@@ -2029,13 +2024,7 @@ var GLmol = (function() {
           if (!this.parseSDF(source))
             this.parseXYZ(source);
 
-
-
-
           this.defineRepresentation();
-
-
-
         };
 
         // For scripting
@@ -2043,5 +2032,11 @@ var GLmol = (function() {
           func(this);
         };
 
-      return GLmol;
+        // GLmol.prototype.loadMolecule = function(query) {
+        //   console.log(query)
+        //
+        //   this.returnModelGroup().
+        // }
+
+        return GLmol;
       }());
